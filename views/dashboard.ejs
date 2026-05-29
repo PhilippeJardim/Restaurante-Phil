@@ -1,38 +1,97 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <title>Restaurante Phil - Dashboard</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .grid { display: flex; gap: 20px; }
-        .card { border: 1px solid #ccc; padding: 15px; border-radius: 8px; width: 300px; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Painel Administrativo</title>
+  <link rel="stylesheet" href="/style.css">
 </head>
-<body>
-    <h1>Painel Administrativo - Restaurante Phil</h1>
-    <div class="grid">
-        <div class="card">
-            <h3>Novo Item (Ingrediente)</h3>
-            <form action="/add-item" method="POST">
-                <input type="text" name="name" placeholder="Nome (Ex: Batata Doce)" required><br><br>
-                <input type="text" name="category" placeholder="Categoria (Ex: Carboidrato)"><br><br>
-                <button type="submit">Cadastrar Item</button>
-            </form>
-        </div>
+<body class="dashboard-body">
 
-        <div class="card">
-            <h3>Itens Cadastrados</h3>
-            <ul>
-                <% items.forEach(item => { %>
-                    <li><%= item.name %> (<%= item.category %>)</li>
-                <% }) %>
-            </ul>
-        </div>
+  <header class="topbar">
+    <div>
+      <h1>🍔 Restaurante Phil</h1>
+      <p>Bem-vindo, <strong><%= usuario.username %></strong></p>
     </div>
 
-    <hr>
-    <h2>📦 Pedidos Ativos</h2>
-    <p><i>Aqui será implementado o Kanban nas próximas aulas...</i></p>
+    <form action="/logout" method="POST">
+      <button class="btn-sair" type="submit">Sair</button>
+    </form>
+  </header>
+
+  <main class="dashboard-container">
+
+    <section class="card">
+      <h2>Novo Item</h2>
+
+      <form action="/items" method="POST">
+        <label>Nome do item</label>
+        <input type="text" name="name" placeholder="Ex: Hambúrguer artesanal" required>
+
+        <label>Categoria</label>
+        <input type="text" name="category" placeholder="Ex: Lanche" required>
+
+        <button type="submit">Cadastrar Item</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Itens Cadastrados</h2>
+
+      <div class="lista">
+        <% items.forEach(item => { %>
+          <div class="lista-item">
+            <strong><%= item.name %></strong>
+            <span><%= item.category %></span>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Novo Pedido</h2>
+
+      <form action="/orders" method="POST">
+        <label>Nome do cliente</label>
+        <input type="text" name="customer_name" placeholder="Ex: João Silva" required>
+
+        <label>Status</label>
+        <select name="status">
+          <option value="Aberto">Aberto</option>
+          <option value="Em preparo">Em preparo</option>
+          <option value="Finalizado">Finalizado</option>
+        </select>
+
+        <button type="submit">Cadastrar Pedido</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Pedidos Ativos</h2>
+
+      <div class="lista">
+        <% orders.forEach(order => { %>
+          <div class="pedido-item">
+            <div>
+              <strong>Pedido #<%= order.id %></strong>
+              <p><%= order.customer_name %></p>
+              <span><%= order.status %></span>
+            </div>
+
+            <form action="/orders/<%= order.id %>/status" method="POST">
+              <select name="status">
+                <option value="Aberto">Aberto</option>
+                <option value="Em preparo">Em preparo</option>
+                <option value="Finalizado">Finalizado</option>
+              </select>
+
+              <button type="submit">Atualizar</button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+  </main>
+
 </body>
 </html>
