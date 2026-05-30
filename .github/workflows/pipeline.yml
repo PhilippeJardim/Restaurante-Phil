@@ -113,14 +113,11 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "https://devsecops.dcotech.com.br"
+          SONAR_HOST_URL: https://devsecops.dcotech.com.br
         with:
           args: >
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.branch.name=${{ github.ref_name }}
-
-  # ==========================================
-  # ETAPAS DE STAGING
-  # ==========================================
 
   job_release_docker:
     needs: estagio_lint
@@ -173,9 +170,10 @@ jobs:
         uses: sonarsource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: "https://devsecops.dcotech.com.br"
+          SONAR_HOST_URL: https://devsecops.dcotech.com.br
         with:
           args: >
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
             -Dsonar.projectKey=${{ github.event.repository.name }}
             -Dsonar.projectName=${{ github.event.repository.name }}
             -Dsonar.branch.name=${{ github.ref_name }}
@@ -183,5 +181,3 @@ jobs:
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.exclusions=node_modules/**,.git/**,.github/**,coverage/**,dist/**
             -Dsonar.sarifReportPaths=trivy-results.sarif
-
-  # teste pipeline 
