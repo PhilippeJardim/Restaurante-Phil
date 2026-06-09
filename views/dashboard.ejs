@@ -21,6 +21,20 @@
   <main class="dashboard-container">
 
     <section class="card">
+      <h2>Novo Usuário</h2>
+
+      <form action="/register" method="POST">
+        <label>Nome de usuário</label>
+        <input type="text" name="username" placeholder="Ex: phil_admin" required>
+
+        <label>Senha</label>
+        <input type="password" name="password" placeholder="Digite a senha" required>
+
+        <button type="submit">Cadastrar Usuário</button>
+      </form>
+    </section>
+
+    <section class="card">
       <h2>Novo Item</h2>
 
       <form action="/items" method="POST">

@@ -88,7 +88,7 @@ jobs:
 
   job_sonar:
     needs: estagio_lint
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
 
     steps:
@@ -124,27 +124,24 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
 
-      - name: Login no GitHub Container Registry
+      - name: Login no Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build e Push da Imagem Docker
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ghcr.io/philippejardim/restaurante-phil:staging
+          tags: |
+            philippejardim/restaurante-phil-app:staging
+            philippejardim/restaurante-phil-app:latest
 
   job_trivy_sonar:
     needs: job_release_docker
@@ -160,7 +157,7 @@ jobs:
       - name: Scan de Segurança com Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/philippejardim/restaurante-phil:staging
+          image-ref: docker.io/philippejardim/restaurante-phil-app:staging
           format: sarif
           output: trivy-results.sarif
           severity: HIGH,CRITICAL
@@ -181,3 +178,50 @@ jobs:
             -Dsonar.sourceEncoding=UTF-8
             -Dsonar.exclusions=node_modules/**,.git/**,.github/**,coverage/**,dist/**
             -Dsonar.sarifReportPaths=trivy-results.sarif
+
+  job_deploy_aws:
+    needs: job_trivy_sonar
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Garantir pasta da aplicação na EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SECRET_KEY }}
+          port: 8082
+          script: |
+            sudo mkdir -p /app
+            sudo chown -R $USER:$USER /app
+
+      - name: Copiar arquivos de configuração via SCP
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SECRET_KEY }}
+          port: 8082
+          source: "docker-compose.yml,init.sql"
+          target: "/app"
+
+      - name: Iniciar contêineres na EC2 via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SECRET_KEY }}
+          port: 8082
+          script: |
+            cd /app
+            docker compose pull
+            docker compose up -d
+            echo "✅ Deploy concluído com sucesso na instância EC2 da AWS!"
+
+      - name: Confirmação de Deploy
+        run: |
+          echo "🎉 O deploy foi disparado e executado com sucesso no servidor AWS EC2 (Porta: 8082)!"

@@ -79,6 +79,28 @@
   
   button:hover{background:#c2410c;}
   
+  .btn-register{
+    display: block;
+    width:100%;
+    padding:14px;
+    border:2px solid #ea580c;
+    border-radius:10px;
+    background:transparent;
+    color:#ea580c;
+    font-size:16px;
+    font-weight:bold;
+    text-align:center;
+    text-decoration:none;
+    margin-top:12px;
+    cursor:pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-register:hover{
+    background:#ea580c;
+    color:white;
+  }
+  
   .erro{
     background:#fee2e2;
     color:#dc2626;
