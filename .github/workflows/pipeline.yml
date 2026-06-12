@@ -116,7 +116,7 @@ jobs:
           SONAR_HOST_URL: https://devsecops.dcotech.com.br
         with:
           args: >
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
             -Dsonar.branch.name=${{ github.ref_name }}
 
   job_release_docker:
@@ -170,7 +170,7 @@ jobs:
           SONAR_HOST_URL: https://devsecops.dcotech.com.br
         with:
           args: >
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
             -Dsonar.projectKey=${{ github.event.repository.name }}
             -Dsonar.projectName=${{ github.event.repository.name }}
             -Dsonar.branch.name=${{ github.ref_name }}
