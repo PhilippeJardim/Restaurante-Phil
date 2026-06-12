@@ -194,7 +194,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SECRET_KEY }}
-          port: 8082
+          port: 22
           script: |
             sudo mkdir -p /app
             sudo chown -R $USER:$USER /app
@@ -205,7 +205,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SECRET_KEY }}
-          port: 8082
+          port: 22
           source: "docker-compose.yml,init.sql"
           target: "/app"
 
@@ -215,9 +215,10 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SECRET_KEY }}
-          port: 8082
+          port: 22
           script: |
             cd /app
+            echo "${{ secrets.ENV_FILE }}" > .env
             docker compose pull
             docker compose up -d
             echo "✅ Deploy concluído com sucesso na instância EC2 da AWS!"

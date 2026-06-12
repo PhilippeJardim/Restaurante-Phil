@@ -1,10 +1,10 @@
-CREATE DATABESE IF NOT EXISTS philippeJardim7
+CREATE DATABASE IF NOT EXISTS philippeJardim7;
 
 USE philippeJardim7;
 
 SET NAMES utf8mb4;
 
-ALTER DATABASE marmitadb
+ALTER DATABASE philippeJardim7
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
